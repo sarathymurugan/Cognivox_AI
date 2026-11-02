@@ -955,6 +955,10 @@ export default function ResultsScreen() {
             analysisResult.linguistic_biomarkers?.total_words ?? 0,
           uniqueWords:
             analysisResult.linguistic_biomarkers?.unique_words ?? 0,
+          mluWords:
+            analysisResult.linguistic_biomarkers?.mlu_words ?? 0,
+          wordsPerMin:
+            analysisResult.linguistic_biomarkers?.words_per_minute ?? 0,
           ttr:
             analysisResult.linguistic_biomarkers
               ?.lexical_diversity_ttr ?? 0,
@@ -969,6 +973,12 @@ export default function ResultsScreen() {
           pronounPct:
             analysisResult.linguistic_biomarkers?.pronoun_percentage ??
             0,
+          coreLexCount:
+            analysisResult.linguistic_biomarkers?.core_lexicon_count ??
+            0,
+          coreLexPerMin:
+            analysisResult.linguistic_biomarkers
+              ?.core_lexicon_per_min ?? 0,
           branch:
             analysisResult.linguistic_biomarkers?.attention_branch ||
             "additive_english",
@@ -1167,11 +1177,6 @@ export default function ResultsScreen() {
           </Text>
         </View>
 
-        {/* 3. Linguistic Biomarkers (BiLSTM Text Branch) */}
-        <Text style={styles.sectionTitle}>
-          Linguistic Biomarkers
-        </Text>
-
         <View style={styles.detailCard}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>
@@ -1180,6 +1185,34 @@ export default function ResultsScreen() {
             <Text style={styles.detailValue}>
               {analysis.linguistic.totalWords} /{" "}
               {analysis.linguistic.uniqueWords}
+            </Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>
+              Mean Utterance Length (MLU)
+            </Text>
+            <Text style={styles.detailValue}>
+              {fmt(analysis.linguistic.mluWords, 1)} words/utt
+            </Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>
+              Speech Efficiency (Words/Min)
+            </Text>
+            <Text style={styles.detailValue}>
+              {fmt(analysis.linguistic.wordsPerMin, 1)} wpm
+            </Text>
+          </View>
+
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>
+              Core Lexicon (CoreLex & /min)
+            </Text>
+            <Text style={styles.detailValue}>
+              {analysis.linguistic.coreLexCount} items (
+              {fmt(analysis.linguistic.coreLexPerMin, 1)}/min)
             </Text>
           </View>
 
@@ -1194,7 +1227,7 @@ export default function ResultsScreen() {
 
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>
-              Filler Words & Repetitions
+              Fillers & Repetitions
             </Text>
             <Text style={styles.detailValue}>
               {analysis.linguistic.fillerCount} fillers,{" "}

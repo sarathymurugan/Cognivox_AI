@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 54,
+    marginTop: 5,
     marginBottom: 20,
   },
   logo: {

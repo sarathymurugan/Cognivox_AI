@@ -7,6 +7,7 @@ import {
   Pressable,
   ScrollView,
   TextInput,
+  Image,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
@@ -30,6 +31,7 @@ export default function CollectDatasetScreen() {
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [mmseScore, setMmseScore] = useState("");
+  const [lowEducationBonus, setLowEducationBonus] = useState(false);
 
   const [selectedAudio, setSelectedAudio] = useState<{
     uri: string;
@@ -40,6 +42,12 @@ export default function CollectDatasetScreen() {
   const [isRecording, setIsRecording] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedEntry, setSavedEntry] = useState<any>(null);
+
+  const COLLECT_TASK_IMAGES: Record<string, any> = {
+  picture_description: require("../../assets/picture1.png"), // Task 1 -> Image 1
+  recall: require("../../assets/picture2.png"),              // Task 2 -> Image 2
+  narrative: require("../../assets/picture3.png"),           // Task 3 -> Image 3
+};
 
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
@@ -119,6 +127,15 @@ export default function CollectDatasetScreen() {
   };
 
   const handleSaveSample = async () => {
+    let adjustedScore = mmseScore.trim();
+    if (adjustedScore !== "" && !Number.isNaN(Number(adjustedScore))) {
+      let numericScore = Number(adjustedScore);
+      if (lowEducationBonus && numericScore < 30) {
+        numericScore = Math.min(30, numericScore + 1);
+      }
+      adjustedScore = String(numericScore);
+    }
+
     if (!participantId.trim()) {
       Alert.alert(
         "Participant ID Required",
@@ -149,9 +166,29 @@ export default function CollectDatasetScreen() {
           clinicalLabel,
           age,
           gender,
-          mmseScore,
+          mmseScore: adjustedScore,
         }
       );
+
+      <Pressable
+      style={[
+        styles.pill,
+        { marginBottom: 14 },
+        lowEducationBonus && styles.pillActive,
+      ]}
+      onPress={() => setLowEducationBonus(!lowEducationBonus)}
+      >
+        <Text
+        style={[
+          styles.pillText,
+          lowEducationBonus && styles.pillTextActive,
+        ]}
+        >
+          {lowEducationBonus
+          ? "✓ ≤12 Years Formal Education (+1 MoCA/MMSE Pt Applied)"
+          : "Tap if Participant Has ≤12 Years Formal Education (+1 Pt)"}
+          </Text>
+      </Pressable>
 
       setSavedEntry(response.dataset_entry);
       setSelectedAudio(null);
@@ -354,6 +391,30 @@ export default function CollectDatasetScreen() {
               </Pressable>
             );
           })}
+        </View>
+        {/* 6. Task Image */}
+        <Text style={styles.sectionLabel}>6. TASK IMAGE</Text>
+        <View
+          style={{
+            width: "100%",
+            height: 220,
+            backgroundColor: "#FFFFFF",
+            borderRadius: 16,
+            padding: 8,
+            marginBottom: 16,
+            borderWidth: 1,
+            borderColor: "#E2E8F0",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {COLLECT_TASK_IMAGES[taskType] && (
+            <Image
+              source={COLLECT_TASK_IMAGES[taskType]}
+              style={{ width: "100%", height: "100%" }}
+            resizeMode="contain"
+            />
+          )}
         </View>
 
         {/* 5. Record or Upload */}
